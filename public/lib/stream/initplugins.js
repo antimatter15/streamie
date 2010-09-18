@@ -17,17 +17,23 @@ require.def("stream/initplugins",
       
       preview: {
         func: function preview() {
+          $(window).resize(function(){
+            var preview = $("#preview");
+            var width = $(window).width() - 450;
+            preview.width(width);
+          });
+          var preview = $("#preview");
+          var width = $(window).width() - 450;
+          preview.width(width);
           $("#stream").delegate("p.text a", "click", function (e) {
             e.preventDefault();
             var preview = $("#preview");
-            var width = $(window).width() - 480;
+            var width = $(window).width() - 450;
             preview.width(width);
-            var height = $(window).height() - 100;
-            preview.height(height);
             preview.show();
-            
+            $("#preview iframe").height($(window).height() - 100);
             var href = this.href;
-            preview.find("iframe").attr("src", href);
+            preview.find("iframe").attr("src", href + '#readStyle=style-newspaper&readSize=size-small&readMargin=margin-narrow');
           })
         }
       },
@@ -108,7 +114,7 @@ require.def("stream/initplugins",
       // signals new tweets
       signalNewTweets: {
         func: function signalNewTweets () {
-          var win = $(window);
+          var win = $('#stream');
           var dirty = win.scrollTop() > 0;
           var newCount = 0;
           

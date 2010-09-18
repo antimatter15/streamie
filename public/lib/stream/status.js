@@ -20,7 +20,7 @@ require.def("stream/status",
         form.bind("status:send", function () {
           form.hide();
           li.removeClass("form");
-          $(window).scrollTop(0); // Good behavior?
+          $('#stream').scrollTop(0); // Good behavior?
         })
         li.addClass("form");
       }
