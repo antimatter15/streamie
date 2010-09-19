@@ -8,7 +8,6 @@ require.def("stream/linkplugins",
   function(helpers) {
     
     return {
-      
       imagePreview: {
         transformations: {
           standard: function (url) {

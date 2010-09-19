@@ -33,7 +33,11 @@ require.def("stream/initplugins",
             preview.show();
             $("#preview iframe").height($(window).height() - 100);
             var href = this.href;
-            preview.find("iframe").attr("src", href + '#readStyle=style-newspaper&readSize=size-small&readMargin=margin-narrow');
+            
+           $.getJSON('http://almaer.com/endpoint/resolver.php?callback=?', 
+            {url: href}, function (url) {
+              preview.find("iframe").attr("src", url + '#readStyle=style-newspaper&readSize=size-small&readMargin=margin-narrow');              
+            })
           })
         }
       },
