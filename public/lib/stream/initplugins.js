@@ -2,6 +2,42 @@
  * List of built in plugins for initialization
  */
 
+
+//i'm not going to bother to rewrite this to be more streamie-ish.
+var obj = {
+  'Instapaper': {
+    icon: 'http://antimatter15.github.com/readability-iframe/instapaper.png',
+    callback: function(url){
+      var j = document.createElement('script');
+      if(localStorage.Instapaper_user){
+        localStorage.Instapaper_user = prompt('What is your Instapaper Username or Email address?');
+        localStorage.Instapaper_pass = prompt('What is your Instapaper Password? You might not have one, if so, leave it blank.','');
+      }
+      var user = encodeURIComponent(localStorage.Instapaper_user), pass = localStorage.Instapaper_pass;
+      window.instapaper_callback = function(res){
+        var errorCodes = {
+          400: "Bad request or exceeded the rate limit. Probably missing a required parameter, such as url.",
+          403: "Invalid username or password.",
+          500: "The service encountered an error. Please try again later."
+        }
+        if(res.status != 201){
+          alert(errorCodes[res.status]||'This shouldnt be possible.');
+        }
+      }
+      j.src = 'https://www.instapaper.com/api/add?jsonp=instapaper_callback&username='+user+'&pass='+pass+'&url='+encodeURIComponent(url);
+      document.body.appendChild(j);
+    }
+  }
+};
+
+window.onmessage = function(e){
+  if(e.data.substr(0,8) == 'READREAD'){
+    var data = e.data.substr(8);
+    obj[data].callback(e.origin);
+  }
+}
+
+
 require.def("stream/initplugins",
   ["stream/tweet", "stream/settings", "stream/twitterRestAPI", "stream/helpers", "text!../templates/tweet.ejs.html"],
   function(tweetModule, settings, rest, helpers, templateText) {
@@ -36,7 +72,15 @@ require.def("stream/initplugins",
             
            $.getJSON('http://almaer.com/endpoint/resolver.php?callback=?', 
             {url: href}, function (url) {
-              preview.find("iframe").attr("src", url + '#readStyle=style-newspaper&readSize=size-small&readMargin=margin-narrow');              
+
+              var tools = [];
+              for(var i in obj){
+                tools.push(i+'=='+obj[i].icon);
+              }
+
+              var readToolsPart = encodeURIComponent(tools.join(';'));
+
+              preview.find("iframe").attr("src", url + '#readStyle=style-newspaper&readSize=size-small&readMargin=margin-narrow&readTools='+readToolsPart);              
             })
           })
         }
