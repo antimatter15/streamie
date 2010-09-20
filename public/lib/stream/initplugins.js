@@ -163,7 +163,7 @@ require.def("stream/initplugins",
       // signals new tweets
       signalNewTweets: {
         func: function signalNewTweets () {
-          var win = $('#stream');
+          var win = $('#container');
           var dirty = win.scrollTop() > 0;
           var newCount = 0;
           
