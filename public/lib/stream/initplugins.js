@@ -9,7 +9,7 @@ var obj = {
     icon: 'http://antimatter15.github.com/readability-iframe/instapaper.png',
     callback: function(url){
       var j = document.createElement('script');
-      if(localStorage.Instapaper_user){
+      if(!localStorage.Instapaper_user){
         localStorage.Instapaper_user = prompt('What is your Instapaper Username or Email address?');
         localStorage.Instapaper_pass = prompt('What is your Instapaper Password? You might not have one, if so, leave it blank.','');
       }
@@ -22,6 +22,7 @@ var obj = {
         }
         if(res.status != 201){
           alert(errorCodes[res.status]||'This shouldnt be possible.');
+          localStorage.Instapaper_user = localStorage.Instapaper_user = '';
         }
       }
       j.src = 'https://www.instapaper.com/api/add?jsonp=instapaper_callback&username='+user+'&pass='+pass+'&url='+encodeURIComponent(url);
