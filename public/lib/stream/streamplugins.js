@@ -288,7 +288,7 @@ require.def("stream/streamplugins",
       // when we insert a new tweet
       // adjust the scrollTop to show the same thing as before
       keepScrollState: {
-        WIN: $('#stream'),
+        WIN: $('#container'),
         func: function keepScrollState (tweet, stream, plugin) {
           if(settings.get("stream", "keepScrollState")) {
             if(!tweet.prefill || !tweet.seenBefore) {

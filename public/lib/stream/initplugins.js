@@ -81,7 +81,7 @@ require.def("stream/initplugins",
 
               var readToolsPart = encodeURIComponent(tools.join(';'));
 
-              preview.find("iframe").attr("src", url + '#readStyle=style-newspaper&readSize=size-small&readMargin=margin-medium&readTools='+readToolsPart);              
+              preview.find("iframe").attr("src", url + '#readStyle=style-ebook&readSize=size-medium&readMargin=margin-medium&readTools='+readToolsPart);              
             })
           })
         }
