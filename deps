@@ -1,0 +1,10 @@
+#! /bin/sh
+
+npm install socket.io
+npm install oauth
+npm install node-static
+npm install nStore
+npm install http-proxy
+npm install less
+git submodule init
+git submodule update

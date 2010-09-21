@@ -76,13 +76,14 @@ b,strong{font-weight:bold;}
 
 
 #container{
-	/*margin:0 auto;*/
-	max-width:440px;
+	margin:0 auto;
+	max-width:640px;
 }
 
 /*header*/
 #header{
 	display:none; /* only shown for authenticated users */
+	position:fixed;
 	top:0;
 	left:0;
 	right:0;
@@ -173,24 +174,6 @@ b,strong{font-weight:bold;}
 		}
 	}
 	
-}
-
-#rightpane {
-	background:#fefefe;
-	border:1px solid #efefef;
-	left: 445px;
-	top: 10px;
-	position: absolute;
-}
-
-#preview {
-	background:#fefefe;
-	border:1px solid #efefef;
-	#client-border-radius > .big;
-	iframe {
-		width:100%;
-		border:none;
-	}
 }
 
 html.no-utf8{

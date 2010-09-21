@@ -12,7 +12,7 @@ if(typeof console == "undefined") {
   }
 }
 require.def("stream/app",
-  ["stream/tweetstream", "stream/tweet", "stream/settings", "stream/streamplugins", "stream/initplugins", "stream/linkplugins", "stream/settingsDialog", "stream/client", "stream/status", "/ext/underscore.js", "/ext/modernizr-1.5.js", "http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"],
+  ["stream/tweetstream", "stream/tweet", "stream/settings", "stream/streamplugins", "stream/initplugins", "stream/linkplugins", "stream/settingsDialog", "stream/client", "stream/status", "stream/tracking", "stream/modernizr", "http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"],
   function(tweetstream, tweetModule, settings, streamPlugin, initPlugin, linkPlugin, settingsDialog, client, status) {
     
     // Stream plugins are called in the order defined here for each incoming tweet.
@@ -20,6 +20,7 @@ require.def("stream/app",
     // They receive two paramters. The tweet which is an instance of stream/tweet.Tweet
     // and the stream which is an instance of stream/tweetstream.Stream.
     var streamPlugins = [
+      streamPlugin.handleDirectMessage,
       streamPlugin.handleRetweet,
       streamPlugin.tweetsOnly,
       streamPlugin.everSeen,
@@ -34,7 +35,8 @@ require.def("stream/app",
       streamPlugin.age,
       streamPlugin.prepend,
       streamPlugin.keepScrollState,
-      streamPlugin.newTweetEvent
+      streamPlugin.newTweetEvent,
+      streamPlugin.webkitNotify
     ];
     
     // initPlugins are loaded when the page is loaded and the backend web socket connection has been established
@@ -48,10 +50,12 @@ require.def("stream/app",
       initPlugin.notifyAfterPause,
       initPlugin.keyboardShortCuts,
       initPlugin.favicon,
+      initPlugin.registerWebkitNotifications,
       initPlugin.throttableNotifactions,
       initPlugin.background,
       initPlugin.preview,
       status.observe,
+      status.mediaUpload,
       status.replyForm,
       status.location,
       status.quote,
@@ -59,6 +63,7 @@ require.def("stream/app",
       status.favorite,
       status.conversation,
       status.autocomplete,
+      status.shortenURLs,
       status.showJSON,
       settingsDialog.init
     ];
@@ -107,7 +112,11 @@ require.def("stream/app",
             }
             else if(data.tweet) {
               // We actually received a tweet. Let the stream process it
-              stream.process(tweetModule.make(JSON.parse(data.tweet)));
+              var data = JSON.parse(data.tweet);
+              if(data.direct_message) {
+                data = data.direct_message;
+              }
+              stream.process(tweetModule.make(data));
             }
             else {
               // dunno what to do here

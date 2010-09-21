@@ -19,7 +19,20 @@ require.def("stream/streamplugins",
     
     return {
       
-      // turns retweets into something similar to tweets
+      // Turns direct messages into something similar to a tweet
+      // Because Streamie uses a stream methaphor for everything it does not make sense to
+      // make a special case for direct messages
+      handleDirectMessage: {
+        func: function handleDirectMessage (tweet) {
+          if(tweet.data.sender) {
+            tweet.direct_message = true;
+            tweet.data.user = tweet.data.sender; // the user is the sender
+          }
+          this();
+        }
+      },
+      
+      // Turns retweets into something similar to tweets
       handleRetweet: {
         func: function handleRetweet (tweet) {
           if(tweet.data.retweeted_status) {
@@ -28,6 +41,7 @@ require.def("stream/streamplugins",
               tweet.data = tweet.data.retweeted_status;
               tweet.retweet = orig;
             } else {
+              console.log(JSON.stringify(tweet, null, " "));
               return;
             }
           }
@@ -43,6 +57,9 @@ require.def("stream/streamplugins",
               $(document).trigger("tweet:first");
             }
             stream.count++;
+            if(tweet.data.user.id == stream.user.user_id) {
+              tweet.yourself = true;
+            }
             this();
           }
         }
@@ -96,8 +113,9 @@ require.def("stream/streamplugins",
       
       // render the template (the underscore.js way)
       renderTemplate: {
-        func: function renderTemplate (tweet) {
+        func: function renderTemplate (tweet, stream) {
           tweet.html = tweet.template({
+            stream: stream,
             tweet: tweet,
             helpers: helpers
           });
@@ -178,10 +196,12 @@ require.def("stream/streamplugins",
       htmlEncode: {
         GT_RE: /\&gt\;/g,
         LT_RE: /\&lt\;/g,
+        QUOT_RE: /\&quot\;/g,
         func: function htmlEncode (tweet, stream, plugin) {
           var text = tweet.data.text;
           text = text.replace(plugin.GT_RE, ">"); // these are preencoded in Twitter tweets
           text = text.replace(plugin.LT_RE, "<");
+          text = text.replace(plugin.QUOT_RE, '"'); // Some clients encode " to &quot; (only a few) If you're tweet contains the literal text &quot; you are out of luck
           text = helpers.html(text);
           tweet.textHTML = text;
           this();
@@ -217,7 +237,7 @@ require.def("stream/streamplugins",
             };
             
             if(tweet.node) {
-              tweet.node.find(".created_at").text(text);
+              tweet.node.find(".created_at a").text(text);
             }
           }
           update()
@@ -290,19 +310,59 @@ require.def("stream/streamplugins",
       keepScrollState: {
         WIN: $('#container'),
         func: function keepScrollState (tweet, stream, plugin) {
-          if(settings.get("stream", "keepScrollState")) {
-            if(!tweet.prefill || !tweet.seenBefore) {
-              var win = plugin.WIN;
-              var cur = win.scrollTop();
-              var next = tweet.node.next();
-              if(next.length > 0) {
-                var top = cur + next.offset().top - tweet.node.offset().top;
+          var next = tweet.node.next();
+          if(next.length > 0) {
+            var height = next.offset().top - tweet.node.offset().top;
+            tweet.height = height;
+            if(settings.get("stream", "keepScrollState")) {
+              if(!tweet.prefill || !tweet.seenBefore) {
+                var win = plugin.WIN;
+                var cur = win.scrollTop();
+              
+                
+                var top = cur + height;
+                
                 win.scrollTop( top );
               }
             }
           }
           this();
         }
+      },
+      
+      // Notify the user via webkit notification
+      webkitNotify: {
+        // how many notifications are currently shown?
+        current: 0,
+        func: function webkitNotify(tweet, stream, plugin) {
+          // only show tweets not seen before, while not prefilling, 
+          // if we have the rights and its enabled in the settings
+          if (!tweet.seenBefore && 
+            !tweet.prefill &&
+            !tweet.yourself &&
+            plugin.current < 5 &&
+            settings.get('notifications', 'enableWebkitNotifications') &&
+            window.webkitNotifications && 
+            window.webkitNotifications.checkPermission() == 0) {
+            try {
+              var notification = 
+                window.webkitNotifications.createNotification(tweet.data.user.profile_image_url, 
+                  tweet.data.user.name, 
+                  tweet.data.text);
+              notification.show();
+              notification.onclose = function() {
+                --plugin.current;
+              } //onclose
+              ++plugin.current;               
+              //hide after 5 seconds
+              setTimeout(function() {
+                notification.cancel();
+              }, 5000);
+            } catch(e) {
+            }
+          }
+          this();
+        } 
       }
       
     }
