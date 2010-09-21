@@ -28,6 +28,12 @@ var obj = {
       j.src = 'https://www.instapaper.com/api/add?jsonp=instapaper_callback&username='+user+'&pass='+pass+'&url='+encodeURIComponent(url);
       document.body.appendChild(j);
     }
+  },
+  'Pagefeed': {
+    icon: 'http://antimatter15.github.com/readability-iframe/pagefeed.png',
+    callback: function(url){
+      window.open('http://pagefeed.appspot.com/page/bookmarklet/?url=' + encodeURIComponent(url));
+    }
   }
 };
 
@@ -38,6 +44,12 @@ window.onmessage = function(e){
   }
 }
 
+$(window).resize(function(){
+  var preview = $("#preview");
+  var width = $(window).width() - 450;
+  $("#preview iframe").height($(window).height() - 100);
+  preview.width(width);
+});
 
 require.def("stream/initplugins",
   ["stream/tweet", "stream/settings", "stream/twitterRestAPI", "stream/helpers", "text!../templates/tweet.ejs.html"],
@@ -54,11 +66,8 @@ require.def("stream/initplugins",
       
       preview: {
         func: function preview() {
-          $(window).resize(function(){
-            var preview = $("#preview");
-            var width = $(window).width() - 450;
-            preview.width(width);
-          });
+          
+          
           var preview = $("#preview");
           var width = $(window).width() - 450;
           preview.width(width);
