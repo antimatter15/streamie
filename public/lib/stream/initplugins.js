@@ -47,7 +47,7 @@ window.onmessage = function(e){
 $(window).resize(function(){
   var preview = $("#preview");
   var width = $(window).width() - 450;
-  $("#preview iframe").height($(window).height() - 100);
+  $("#preview iframe").height($(window).height() - 75);
   preview.width(width);
 });
 
@@ -73,16 +73,12 @@ require.def("stream/initplugins",
         func: function preview() {
           
           
-          var preview = $("#preview");
-          var width = $(window).width() - 450;
-          preview.width(width);
+          $(window).resize();
           $("#stream").delegate("p.text a", "click", function (e) {
             e.preventDefault();
             var preview = $("#preview");
-            var width = $(window).width() - 450;
-            preview.width(width);
-            preview.show();
-            $("#preview iframe").height($(window).height() - 100);
+            $(window).resize();
+
             var href = this.href;
             
            $.getJSON('http://almaer.com/endpoint/resolver.php?callback=?', 
