@@ -51,6 +51,11 @@ $(window).resize(function(){
   preview.width(width);
 });
 
+$(function(){
+	$(window).resize();
+	$("#preview iframe").attr('src', 'http://antimatter15.github.com/streamie/public/streamieinfo.html');
+})
+
 require.def("stream/initplugins",
   ["stream/tweet", "stream/settings", "stream/twitterRestAPI", "stream/helpers", "text!../templates/tweet.ejs.html"],
   function(tweetModule, settings, rest, helpers, templateText) {
