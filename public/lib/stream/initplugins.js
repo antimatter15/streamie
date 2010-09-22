@@ -53,7 +53,7 @@ $(window).resize(function(){
 
 $(function(){
 	$(window).resize();
-	$("#preview iframe").attr('src', 'http://antimatter15.github.com/streamie/public/streamieinfo.html');
+	$("#preview iframe").attr('src', 'http://antimatter15.github.com/streamie/public/streamie_info.html');
 })
 
 require.def("stream/initplugins",
